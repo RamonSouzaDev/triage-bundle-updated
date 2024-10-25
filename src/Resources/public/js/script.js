@@ -57,12 +57,18 @@
             prioridadeModal: null,
         },
         computed: {
-            servicosHabilitados: function () {
+            prioridadeNormal() {
+                return this.prioridades.filter(p => p.peso === 0)[0];
+            },
+            demaisPrioridades() {
+                return this.prioridades.filter(p => p.peso > 0);
+            },
+            servicosHabilitados() {
                 return this.servicos.filter(function (su) {
                     return su.habilitado;
                 });
             },
-            agendamentosFiltrados: function () {
+            agendamentosFiltrados () {
                 return this.agendamentos.filter(agendamento => {
                     if (!this.filtroAgendamento) {
                         return this.agendamentos;
@@ -77,16 +83,15 @@
         },
         methods: {
             update() {
-                var self = this;
                 App.ajax({
                     url: App.url('/novosga.triage/ajax_update'),
                     data: {
-                        ids: self.servicoIds.join(','),
+                        ids: this.servicoIds.join(','),
                     },
-                    success: function (response) {
+                    success: (response) => {
                         if (response.data) {
-                            self.totais = response.data.servicos;
-                            self.ultimaSenha = response.data.ultima;
+                            this.totais = response.data.servicos;
+                            this.ultimaSenha = response.data.ultima;
                         }
                     }
                 });
@@ -100,15 +105,14 @@
                 Impressao.imprimir(atendimento);
             },
             showServicoInfo(servico) {
-                var self = this;
                 App.ajax({
                     url: App.url('/novosga.triage/servico_info'),
                     data: {
-                        id: servico
+                        id: servico,
                     },
-                    success(response) {
-                        self.servicoInfo = response.data;
-                        self.servicoModal.show();
+                    success: (response) => {
+                        this.servicoInfo = response.data;
+                        this.servicoModal.show();
                     }
                 });
             },
@@ -122,39 +126,33 @@
                 }
             },
             loadAgendamentos() {
-                var self = this;
-                self.agendamentos = [];
-                
-                if (!self.servicoAgendamento) {
+                if (!this.servicoAgendamento) {
                     return;
                 }
-
+                this.agendamentos = [];
                 App.ajax({
-                    url: App.url('/novosga.triage/agendamentos/') + self.servicoAgendamento,
-                    success: function (response) {
-                        self.agendamentos = response.data;
+                    url: App.url(`/novosga.triage/agendamentos/${this.servicoAgendamento}`),
+                    success: (response) => {
+                        this.agendamentos = response.data;
                     }
                 });
             },
             agendamentoConfirm(agendamento) {
-                var self = this;
-                
                 App.ajax({
-                    url: App.url('/novosga.triage/distribui_agendamento/') + agendamento.id,
+                    url: App.url(`/novosga.triage/distribui_agendamento/${agendamento.id}`),
                     type: 'post',
-                    success(response) {
-                        self.atendimento = response.data;
-                        self.print(self.atendimento);
-
-                        if (self.config.exibir) {
-                            self.senhaModal.show();
+                    success: (response) => {
+                        this.atendimento = response.data;
+                        this.print(this.atendimento);
+                        if (this.config.exibir) {
+                            this.senhaModal.show();
                         }
                     },
-                    complete() {
-                        self.pausado = false;
-                        self.servicoAgendamento = null;
-                        self.loadAgendamentos();
-                        self.agendamentosModal.hide();
+                    complete: () => {
+                        this.pausado = false;
+                        this.servicoAgendamento = null;
+                        this.loadAgendamentos();
+                        this.agendamentosModal.hide();
                     }
                 });
             },
@@ -163,80 +161,77 @@
                 this.senhaModal.show();
             },
             distribuiSenhaNormal(servico) {
-                this.distribuiSenha(servico, 1);
+                if (!this.prioridadeNormal) {
+                    return;
+                }
+                this.distribuiSenha(servico, this.prioridadeNormal.id);
             },
             distribuiSenhaPrioritaria() {
                 if (!this.prioridade || !this.servico) {
                     return;
                 }
-
                 this.distribuiSenha(this.servico, this.prioridade.id);
                 this.prioridadeModal.hide();
             },
             distribuiSenha(servico, prioridade) {
-                var self = this;
                 return new Promise((resolve, reject) => {
-                    if (self.pausado) {
+                    if (this.pausado) {
                         return reject();
                     }
                     // evitando de gerar várias senhas com múltiplos cliques
-                    self.pausado = true;
+                    this.pausado = true;
 
                     const data = {
                         servico: servico,
                         prioridade: prioridade,
                         cliente: null,
                     };
-                    if (self.cliente.nome && self.cliente.documento) {
-                        data.cliente = {...self.cliente};
+                    if (this.cliente.nome && this.cliente.documento) {
+                        data.cliente = {...this.cliente};
                     }
 
                     App.ajax({
                         url: App.url('/novosga.triage/distribui_senha'),
                         type: 'post',
                         data: data,
-                        success(response) {
-                            self.atendimento = response.data;
-                            self.print(self.atendimento);
+                        success: (response) => {
+                            this.atendimento = response.data;
+                            this.print(this.atendimento);
 
-                            if (self.config.exibir) {
-                                self.senhaModal.show();
+                            if (this.config.exibir) {
+                                this.senhaModal.show();
                             }
                             
-                            resolve(self.atendimento);
-                            self.cliente = {};
+                            resolve(this.atendimento);
+                            this.cliente = {};
                             
-                            self.update();
+                            this.update();
                         },
                         error() {
                             reject();
                         },
                         complete() {
-                            self.pausado = false;
+                            this.pausado = false;
                         }
                     });
                 });
             },
             consultar() {
-                var self = this;
-
                 App.ajax({
                     url: App.url('/novosga.triage/consulta_senha'),
                     data: {
-                        numero: self.search
+                        numero: this.search
                     },
-                    success: function (response) {
-                        self.searchResult = response.data;
+                    success: (response) => {
+                        this.searchResult = response.data;
                     }
                 });
             },
             saveConfig() {
                 this.config.desabilitados = [];
-
-                var self = this;
-                this.servicos.forEach(function (su) {
+                this.servicos.forEach((su) => {
                     if (!su.habilitado) {
-                        self.config.desabilitados.push(su.servico.id);
+                        this.config.desabilitados.push(su.servico.id);
                     }
                 });
                 
@@ -266,21 +261,19 @@
                     // do nothing
                 }
 
-                var self = this;
-                this.servicos.forEach(function (su) {
-                    var habilitado = self.config.desabilitados.indexOf(su.servico.id) === -1;
+                this.servicos.forEach((su) => {
+                    const habilitado = this.config.desabilitados.indexOf(su.servico.id) === -1;
                     Vue.set(su, 'habilitado', habilitado);
                 });
             },
             fetchClients: _.debounce(function () {
-                var self = this;
                 App.ajax({
                     url: App.url('/novosga.triage/clientes'),
                     data: {
-                        q: self.cliente.documento
+                        q: this.cliente.documento
                     },
-                    success: function (response) {
-                        self.clientes = response.data;
+                    success: (response) => {
+                        this.clientes = response.data;
                     }
                 })
             }, 250),

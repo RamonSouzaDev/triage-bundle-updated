@@ -23,10 +23,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 final readonly class NovaSenhaDto
 {
     public function __construct(
+        #[Assert\NotNull]
         #[Assert\Range(min: 1)]
-        public int $servico,
+        public ?int $servico,
+        #[Assert\NotNull]
         #[Assert\Range(min: 1)]
-        public int $prioridade,
+        public ?int $prioridade,
         #[Assert\Valid]
         public ?ClienteDto $cliente,
     ) {

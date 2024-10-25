@@ -36,6 +36,10 @@ body>section {
     padding: 5px;
 }
 
+#triagem-servicos .triagem-servico a {
+    text-decoration: none;
+}
+
 #dialog-prioridade ul {
     list-style: none;
 }
@@ -62,20 +66,9 @@ body>section {
     font-style: italic;
 }
 
-p.links {
-    padding-top: 20px;
-    text-align: center;
-    clear: both;
-}
-
-p.links a {
-    margin: 0 5px;
-}
-
 #dialog-busca .modal-dialog {
     max-width: 90%;
 }
-
 
 #dialog-busca .result {
     overflow: auto;

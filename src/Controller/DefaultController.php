@@ -200,14 +200,18 @@ class DefaultController extends AbstractController
                 ->setDocumento($data->cliente->documento ?? '');
         }
 
-        $data = $atendimentoService->distribuiSenha(
-            $unidade,
-            $usuario,
-            $data->servico,
-            $data->prioridade,
-            $cliente
-        );
-        $envelope->setData($data);
+        try {
+            $data = $atendimentoService->distribuiSenha(
+                $unidade,
+                $usuario,
+                $data->servico,
+                $data->prioridade,
+                $cliente
+            );
+            $envelope->setData($data);
+        } catch (Exception $ex) {
+            $envelope->exception($ex);
+        };
 
         return $this->json($envelope);
     }
@@ -300,15 +304,10 @@ class DefaultController extends AbstractController
         $unidade = $usuario->getLotacao()->getUnidade();
         $data = new DateTime();
 
-        $agendamentos = $agendamentoRepository->findBy(
-            [
-                'unidade' => $unidade,
-                'servico' => $servicoId,
-                'data' => $data,
-            ],
-            [
-                'hora' => 'ASC'
-            ]
+        $agendamentos = $agendamentoRepository->findByUnidadeAndServicoAndData(
+            $unidade,
+            $servicoId,
+            $data
         );
 
         return $this->json(new Envelope($agendamentos));

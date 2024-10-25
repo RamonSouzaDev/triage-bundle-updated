@@ -24,9 +24,9 @@ final readonly class ClienteDto
 {
     public function __construct(
         #[Assert\NotBlank]
-        public string $nome,
+        public ?string $nome,
         #[Assert\NotBlank]
-        public string $documento,
+        public ?string $documento,
     ) {
     }
 }

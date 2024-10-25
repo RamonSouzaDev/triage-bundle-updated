@@ -3,19 +3,28 @@
 {% trans_default_domain 'NovosgaTriageBundle' %}
 
 {% block body %}
-    <div class="row">
-        <div class="col-sm-12">
+    <div class="d-flex">
+        <div>
             <h1>
-                <i class="fa fa-print" aria-hidden="true"></i>
-                {{ 'title'|trans }}
-                <small>
-                    {{ 'subtitle'|trans }}
-                </small>
+                <i class="fa fa-print" aria-hidden="true"></i> {{ 'title'|trans }}
             </h1>
+            <p>{{ 'subtitle'|trans }}</p>
+        </div>
+        <div class="ms-auto mt-3">
+            <a href="#dialog-busca" class="btn btn-outline-secondary" data-bs-toggle="modal">
+                <i class="fa fa-search"></i>&nbsp;
+                {% trans %}Consultar senha{% endtrans %}
+            </a>
+            <a href="#dialog-agendamentos" class="btn btn-outline-secondary" data-bs-toggle="modal">
+                <i class="fa fa-calendar"></i>&nbsp;
+                {% trans %}Agendamentos{% endtrans %}
+            </a>
+            <a href="#dialog-triagem-config" class="btn btn-outline-secondary" data-bs-toggle="modal">
+                <i class="fa fa-cog"></i>&nbsp;
+                {% trans %}Configuração{% endtrans %}
+            </a>
         </div>
     </div>
-    
-    <hr>
     
     <div id="triagem" v-cloak>
         <div id="infobar" class="row">
@@ -90,11 +99,11 @@
                             {%- endverbatim -%}
                         </span>
                         <span class="buttons pull-right">
-                            <button class="btn btn-primary" title="{% trans %}Distribuir senha normal{% endtrans %}" v-on:click.prevent="distribuiSenhaNormal(su.servico.id)" v-if="su.tipo !== 3">
-                                {% trans %}Normal{% endtrans %}
-                            </button>
                             {% if prioridades|length %}
-                                <button class="btn btn-danger" title="{% trans %}Distribuir senha com prioridade{% endtrans %}" v-on:click.prevent="showPrioridades(su.servico.id)" v-if="su.tipo !== 2">
+                                <button class="btn btn-primary" title="{% trans %}Distribuir senha normal{% endtrans %}" v-on:click.prevent="distribuiSenhaNormal(su.servico.id)" v-if="prioridadeNormal && su.tipo !== 3">
+                                    {% trans %}Normal{% endtrans %}
+                                </button>
+                                <button class="btn btn-danger" title="{% trans %}Distribuir senha com prioridade{% endtrans %}" v-on:click.prevent="showPrioridades(su.servico.id)" v-if="demaisPrioridades.length && su.tipo !== 2">
                                     {{ 'label.priority'|trans }}
                                 </button>
                             {% endif %}
@@ -103,20 +112,6 @@
                 </div>
             </div>
         </div>
-        <p class="links">
-            <a href="#dialog-busca" class="btn btn-secondary" data-bs-toggle="modal">
-                <i class="fa fa-search"></i>&nbsp;
-                {% trans %}Consultar senha{% endtrans %}
-            </a>
-            <a href="#dialog-triagem-config" class="btn btn-secondary" data-bs-toggle="modal">
-                <i class="fa fa-cog"></i>&nbsp;
-                {% trans %}Configuração{% endtrans %}
-            </a>
-            <a href="#dialog-agendamentos" class="btn btn-secondary" data-bs-toggle="modal">
-                <i class="fa fa-calendar"></i>&nbsp;
-                {% trans %}Agendamentos{% endtrans %}
-            </a>
-        </p>
 
         {# iframe para impressao, evitando popup #}
         <iframe id="frame-impressao" width="0" height="0" style="border:none;"></iframe>
@@ -220,7 +215,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" v-if="servicoInfo">
-                        <table class="table table-bordered">
+                        <table class="table">
                             <tbody>
                                 <tr>
                                     <th>
@@ -291,7 +286,7 @@
                     </div>
                     <div class="modal-body">
                         <ul>
-                            <li v-for="p in prioridades">
+                            <li v-for="p in demaisPrioridades">
                                 <label>
                                     <input type="radio" v-bind:value="p" v-model="prioridade">
                                     {% verbatim %}
@@ -335,7 +330,7 @@
                         <div class="result">
                             <table class="table">
                                 <thead>
-                                    <tr>
+                                    <tr class="table-primary">
                                         <th>{{ 'label.ticket.number'|trans }}</th>
                                         <th>{{ 'label.service'|trans }}</th>
                                         <th>{{ 'label.ticket.arrival_date'|trans }}</th>
@@ -421,7 +416,7 @@
                         </div>
                         <table class="table">
                             <thead>
-                                <tr>
+                                <tr class="table-primary">
                                     <th>{{ 'label.date'|trans }}</th>
                                     <th>{{ 'label.time'|trans }}</th>
                                     <th>{{ 'label.name'|trans }}</th>
@@ -444,8 +439,8 @@
                                         <td>
                                             {{agendamento.cliente.documento}}
                                         </td>
-                                        <td>
-                                            <button type="button" class="btn btn-default" 
+                                        <td class="text-end">
+                                            <button type="button" class="btn btn-outline-success" 
                                                     title="{% trans %}Confirmar presença{% endtrans %}" 
                                                     v-on:click="agendamentoConfirm(agendamento)"
                                                     v-if="!agendamento.dataConfirmacao">
