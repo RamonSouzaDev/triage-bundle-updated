@@ -1,83 +1,194 @@
-/**
- * Novo SGA - Triagem
- * @author Rogerio Lino <rogeriolino@gmail.com>
- */
-body>section {
-    padding: 20px 10px;
-}
- 
-#infobar {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-bottom: 5px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    background-color: #F7F9FE;
-    background-position: 20px center;
-    background-repeat: no-repeat;
-    border: 1px solid #e1e1e8;
+/* Estilos do modal de senha */
+#dialog-senha .modal-dialog {
+    max-width: 350px;
 }
 
-#infobar .ultima-senha {
-    font-size: 1.5em;
+#dialog-senha .modal-content {
+    border-radius: 8px;
+    padding: 20px;
+}
+
+#dialog-senha .label {
     font-weight: bold;
-    text-align: center;
+    color: #666;
+    margin-bottom: 5px;
 }
 
+#dialog-senha .numero {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+#dialog-senha .servico,
+#dialog-senha .nome-prioridade {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+#dialog-senha .modal-footer .btn {
+    width: 100%;
+    font-size: 1em;
+}
+
+/* Estilos gerais */
+body > section {
+    background: #f8f9fa;
+    padding: 20px;
+}
+
+.row {
+    margin-top: 16px;
+}
+
+/* Container principal */
+.container-fluid {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* Container de serviços */
 #triagem-servicos {
-    margin-left: -5px !important;
-    margin-right: -5px !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: -10px; /* Compensa o padding dos items */
 }
 
-#triagem-servicos .triagem-servico {
-    padding: 5px;
+/* Cada item de serviço */
+.triagem-servico {
+    flex: 0 0 calc(33.333% - 20px); /* Exatamente 1/3 da largura menos o gap */
+    max-width: calc(33.333% - 20px);
+    margin: 10px;
 }
 
-#dialog-prioridade ul {
-    list-style: none;
+/* Card styles */
+.card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 100%;
 }
 
-#dialog-prioridade ul li {
-    padding: 5px 0;
+.card-body {
+    padding: 15px;
+    position: relative;
+    background: #e9ecef;
 }
 
-#dialog-prioridade ul li input {
-    margin: 5px 10px 0 0;
-    float: left;
+.card-body a {
+    display: inline-block;
+    color: #0d6efd;
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 10px;
+    max-width: calc(100% - 60px);
 }
 
-#dialog-servico div {
-    padding-bottom: 10px;
+/* Badge */
+.badge-secondary {
+    background: #6c757d;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 12px;
 }
 
-#dialog-servico div h3 {
-    padding: 10px 0 5px 5px;
+/* Buttons container */
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
 }
 
-#dialog-servico div .subservicos.empty {
-    color: #999;
-    font-style: italic;
-}
-
-p.links {
-    padding-top: 20px;
+.buttons .btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 500;
     text-align: center;
-    clear: both;
+    border: none;
 }
 
-p.links a {
-    margin: 0 5px;
+.btn-primary {
+    background: #0d47a1;
+    color: white;
 }
 
-#dialog-busca .modal-dialog {
-    max-width: 90%;
+.btn-danger {
+    background: #dc3545;
+    color: white;
 }
 
-
-#dialog-busca .result {
-    overflow: auto;
+/* Links inferiores */
+p.links {
+    margin-top: 30px;
+    text-align: center;
 }
 
+.links .btn {
+    background: #0d47a1;
+    border-color: #0d47a1;
+    padding: 8px 20px;
+    margin-right: 15px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.links .btn i {
+    margin-right: 8px;
+}
+
+/* Input fields */
+.input-group {
+    margin-bottom: 0;
+}
+
+.form-control {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+/* Última senha */
+.ultima-senha {
+    background: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.ultima-senha .btn {
+    font-size: 14px;
+    padding: 4px 12px;
+    background: #0d47a1;
+    border-color: #0d47a1;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .triagem-servico {
+        flex: 0 0 calc(50% - 20px);
+        max-width: calc(50% - 20px);
+    }
+}
+
+@media (max-width: 768px) {
+    .triagem-servico {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin: 10px 0;
+    }
+}

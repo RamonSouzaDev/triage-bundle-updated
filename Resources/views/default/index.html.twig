@@ -4,7 +4,7 @@
 
 {% block body %}
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-8">
             <h1>
                 <i class="fa fa-print" aria-hidden="true"></i>
                 {{ 'title'|trans }}
@@ -12,6 +12,23 @@
                     {{ 'subtitle'|trans }}
                 </small>
             </h1>
+        </div>
+        <div class="col-sm-4">
+            <form class="form-inline float-right" method="GET" action="{{ path('novosga_triage_index') }}">
+                <div class="input-group">
+                    <input type="text" 
+                           class="form-control" 
+                           name="q" 
+                           placeholder="Pesquisar serviços..." 
+                           value="{{ app.request.get('q') }}"
+                           aria-label="Pesquisar">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     
@@ -63,6 +80,8 @@
             </div>
         </div>
 
+        
+
         <div id="triagem-servicos" class="row">
             <div class="col-md-12" v-if="servicos.length === 0">
                 <div class="jumbotron text-center">
@@ -76,7 +95,7 @@
                     <p>Nenhum serviço marcado para exibição. Clique em <b>Configurações</b> abaixo para marcar os seriços desejados.</p>
                 </div>
             </div>
-            <div class="triagem-servico col-md-6" v-for="su in servicosHabilitados">
+            <div class="triagem-servico" v-for="su in servicosHabilitados">
                 <div class="card">
                     <div class="card-body">
                         <a href="#" v-on:click.prevent="showServicoInfo(su.servico.id)">
@@ -127,42 +146,41 @@
 
         {# dialog para exibir a senha gerada #}
         <div id="dialog-senha" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content text-center">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ 'label.ticket'|trans }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body" v-if="atendimento">
                         <div class="field">
-                            <h4>{{ 'label.ticket.number'|trans }}</h4>
+                            <p class="label">Número</p>
                             <p class="numero">
                                 {%- verbatim -%}
-                                    {{atendimento.senha.format}}
+                                    {{ atendimento.senha.format }}
                                 {%- endverbatim -%}
                             </p>
                         </div>
                         <div class="field">
-                            <h4>{{ 'label.service'|trans }}</h4>
+                            <p class="label">Serviço</p>
                             <p class="servico">
                                 {%- verbatim -%}
-                                    {{atendimento.servico.nome}}
+                                    {{ atendimento.servico.nome }}
                                 {%- endverbatim -%}
                             </p>
                         </div>
                         <div class="field">
-                            <h4>{{ 'label.priority'|trans }}</h4>
+                            <p class="label">Prioridade</p>
                             <p class="nome-prioridade">
                                 {%- verbatim -%}
-                                    {{atendimento.prioridade.nome}}
+                                    {{ atendimento.prioridade.nome }}
                                 {%- endverbatim -%}
                             </p>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" v-on:click.prevent="reprint(atendimento)">
-                            <i class="fa fa-print"></i> 
-                            {% trans %}Imprimir{% endtrans %}
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-primary btn-lg" v-on:click.prevent="reprint(atendimento)">
+                            <i class="fa fa-print"></i> Imprimir
                         </button>
                     </div>
                 </div>
@@ -465,12 +483,174 @@
             </div>
         </div>
     </div>
+
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <link type="text/css" rel="stylesheet" href="{{ asset('bundles/novosgatriage/css/style.css') }}">
-{% endblock %}    
+    <style>
+    
+    #dialog-senha .modal-dialog {
+        max-width: 350px; /* Define um tamanho menor para o diálogo */
+    }
+
+    #dialog-senha .modal-content {
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    #dialog-senha .label {
+        font-weight: bold;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    #dialog-senha .numero {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    #dialog-senha .servico,
+    #dialog-senha .nome-prioridade {
+        font-size: 1.2em;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    #dialog-senha .modal-footer .btn {
+        width: 100%;
+        font-size: 1em;
+    }
+
+
+
+        body > section {
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        /* Container principal */
+        .container-fluid {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Serviço Styles */
+        .triagem-servico {
+            margin-bottom: 30px;
+        }
+
+        .card-body {
+            background: #e9ecef;
+        }
+
+        /* Título do serviço */
+        .servico-titulo {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .servico-contador {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Layout dos botões */
+        .buttons {
+            display: flex;
+            gap: 15px;
+            width: 87%;
+            padding-top: 5px;
+        }
+
+        .buttons .btn {
+            flex: 1;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 500;
+            max-width: 180px;
+        }
+
+        .buttons .btn-primary {
+            background: #0d47a1;
+            border-color: #0d47a1;
+        }
+
+        .buttons .btn-danger {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+
+        /* Layout da linha de serviços */
+        .servico-linha {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 30px;
+        }
+
+        /* Botões inferiores */
+        .links {
+            margin-top: 30px;
+        }
+
+        .links .btn {
+            background: #0d47a1;
+            border-color: #0d47a1;
+            padding: 8px 20px;
+            margin-right: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .links .btn i {
+            margin-right: 8px;
+        }
+
+        /* Input fields */
+        .input-fields {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 0;
+        }
+
+        .form-control {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        /* Última senha */
+        .ultima-senha {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .ultima-senha .btn {
+            font-size: 14px;
+            padding: 4px 12px;
+            background: #0d47a1;
+            border-color: #0d47a1;
+        }
+        .row {
+            margin-top: 16px;
+        }
+    </style>
+{% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
