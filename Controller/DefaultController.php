@@ -51,13 +51,30 @@ class DefaultController extends AbstractController
         $unidade = $usuario->getLotacao()->getUnidade();
         
         $prioridades = $em->getRepository(Prioridade::class)->findAtivas();
+        
+        // Busca todos os serviços ativos da unidade
         $servicos = $servicoService->servicosUnidade($unidade, ['ativo' => true]);
+        
+        // Adiciona a busca no nível do backend
+        $search = $request->get('q');
+        if (!empty($search)) {
+            $search = mb_strtolower($search);
+            $servicosFiltrados = array_filter($servicos, function($su) use ($search) {
+                return (
+                    mb_stripos($su->getServico()->getNome(), $search) !== false ||
+                    mb_stripos($su->getSigla(), $search) !== false ||
+                    ($su->getServico()->getDescricao() && mb_stripos($su->getServico()->getDescricao(), $search) !== false)
+                );
+            });
+            $servicos = array_values($servicosFiltrados);
+        }
         
         return $this->render('@NovosgaTriage/default/index.html.twig', [
             'usuario' => $usuario,
             'unidade' => $unidade,
             'servicos' => $servicos,
             'prioridades' => $prioridades,
+            'search' => $search,
         ]);
     }
 
