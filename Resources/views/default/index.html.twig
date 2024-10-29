@@ -3,38 +3,47 @@
 {% trans_default_domain 'NovosgaTriageBundle' %}
 
 {% block body %}
-    <div class="row">
-        <div class="col-sm-8">
-            <h1>
-                <i class="fa fa-print" aria-hidden="true"></i>
-                {{ 'title'|trans }}
-                <small>
-                    {{ 'subtitle'|trans }}
-                </small>
-            </h1>
+    <div class="triagem-header">
+    <h1>
+        <i class="fa fa-print" aria-hidden="true"></i>
+        {{ 'title'|trans }}
+        <small>
+            {{ 'subtitle'|trans }}
+        </small>
+    </h1>
+
+   
+
+    
+    <form class="search-section" method="GET" action="{{ path('novosga_triage_index') }}" id="searchForm">
+        <div class="input-group">
+            <input type="text" 
+                class="search-input" 
+                name="q" 
+                placeholder="Pesquisar serviços..." 
+                value="{{ app.request.get('q') }}"
+                aria-label="Pesquisar"
+                oninput="submitSearch()">
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-secondary">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
         </div>
-        <div class="col-sm-4">
-            <form class="form-inline float-right" method="GET" action="{{ path('novosga_triage_index') }}">
-                <div class="input-group">
-                    <input type="text" 
-                           class="form-control" 
-                           name="q" 
-                           placeholder="Pesquisar serviços..." 
-                           value="{{ app.request.get('q') }}"
-                           aria-label="Pesquisar">
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-secondary">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
+    </form>
     </div>
     
     <hr>
     
     <div id="triagem" v-cloak>
+     <div class="ultima-senha" title="{% trans %}Última senha{% endtrans %}" v-if="ultimaSenha">
+            <button v-bind:class="{ 'btn btn-sm':true, 'btn-primary': ultimaSenha.prioridade.peso===0, 'btn-danger': ultimaSenha.prioridade.peso>0 }" v-on:click="showTicket(ultimaSenha)">
+                <i class="fa fa-print"></i>&nbsp;
+                {%- verbatim -%}
+                    {{ultimaSenha.senha.format}}
+                {%- endverbatim -%}
+            </button>
+        </div>
         <div id="infobar" class="row">
             <div class="col-md-10 col-9">
                 <div class="row">
@@ -68,16 +77,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2 col-3">
-                <div class="ultima-senha" title="{% trans %}Última senha{% endtrans %}" v-if="ultimaSenha">
-                    <button v-bind:class="{ 'btn btn-sm':true, 'btn-primary': ultimaSenha.prioridade.peso===0, 'btn-danger': ultimaSenha.prioridade.peso>0 }" v-on:click="showTicket(ultimaSenha)">
-                        <i class="fa fa-print"></i>&nbsp;
-                        {%- verbatim -%}
-                            {{ultimaSenha.senha.format}}
-                        {%- endverbatim -%}
-                    </button>
-                </div>
-            </div>
+           
         </div>
 
         
@@ -179,7 +179,7 @@
                         </div>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-primary btn-lg" v-on:click.prevent="reprint(atendimento)">
+                        <button type="button" class="btn btn-primary btn-lg azul" v-on:click.prevent="reprint(atendimento)">
                             <i class="fa fa-print"></i> Imprimir
                         </button>
                     </div>
@@ -490,7 +490,109 @@
     {{ parent() }}
     <link type="text/css" rel="stylesheet" href="{{ asset('bundles/novosgatriage/css/style.css') }}">
     <style>
-    
+    .azul {
+        background: #0d47a1; 
+        border-color: #0d47a1;
+    }
+    /* Reset base styles */
+    .triagem-header {
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+    /* Última senha positioning */
+    .ultima-senha {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0px 0px;
+        background: #fff;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        margin-right: 40px;
+        margin-top: 210px;
+    }
+
+    /* Infobar adjustments */
+    #infobar {
+        margin-top: 20px;
+    }
+
+    /* Ensure proper spacing */
+    #triagem-servicos {
+        margin-top: 20px;
+    }
+
+    /* Remove unnecessary margins */
+    .row:first-child {
+        margin-top: 0;
+    }
+    /* Adjust header layout */
+    .row:first-child {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    /* Move última senha to top right */
+    .ultima-senha {
+        margin-left: auto;
+        padding: 4px 12px;
+        background: white;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+    }
+
+    .ultima-senha .btn {
+        font-size: 14px;
+        padding: 0px 0px;
+    }
+
+    /* Title and search section */
+    .triagem-header {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .triagem-title {
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Search bar positioning */
+    #triagem .search-section {
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    .search-input {
+        width: 100%;
+        max-width: 300px;
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    /* Adjust spacing for main content */
+    #triagem-servicos {
+        margin-top: 20px;
+    }
+
+    /* Reset margins */
+    .col-sm-8, .col-sm-4 {
+        margin: 0;
+        padding: 0 15px;
+    }
+
+    /* Ensure proper spacing between elements */
+    #infobar {
+        margin-top: 20px;
+    }
     #dialog-senha .modal-dialog {
         max-width: 350px; /* Define um tamanho menor para o diálogo */
     }
@@ -545,6 +647,7 @@
 
         .card-body {
             background: #e9ecef;
+            padding: 0.9rem;
         }
 
         /* Título do serviço */
@@ -635,7 +738,7 @@
         /* Última senha */
         .ultima-senha {
             background: white;
-            padding: 4px 12px;
+            padding: 0px 0px;
             border-radius: 4px;
             border: 1px solid #dee2e6;
         }
@@ -655,6 +758,17 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
+    let timeout = null;
+
+    function submitSearch() {
+        // Cancela o timeout anterior, se existir
+        clearTimeout(timeout);
+
+        // Define um novo timeout para esperar antes de submeter o formulário
+        timeout = setTimeout(() => {
+            document.getElementById('searchForm').submit();
+        }, 500); // Ajuste o tempo de espera (em milissegundos) conforme necessário
+    }
         var servicos       = {{ servicos|json_encode()|raw }},
             prioridades    = {{ prioridades|json_encode()|raw}},
             usuario        = {{ usuario|json_encode()|raw }},
