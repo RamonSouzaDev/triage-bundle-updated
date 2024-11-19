@@ -55,11 +55,47 @@
             agendamentos: [],
             servicoAgendamento: null,
             filtroAgendamento: '',
+            servicoSearch: '',
+            searchQuery: '',
+            allServices: [], // array com todos os serviços
+            servicosHabilitados: [] 
         },
         computed: {
             servicosHabilitados: function () {
                 return this.servicos.filter(function (su) {
                     return su.habilitado;
+                });
+            },
+            servicosHabilitados: function () {
+                return this.servicos.filter(function (su) {
+                    return su.habilitado;
+                });
+            },
+            searchServices() {
+                if (this.searchQuery.length > 0) {
+                    this.servicosHabilitados = this.servicos.filter(service => 
+                        service.servico.nome.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                        service.sigla.toLowerCase().includes(this.searchQuery.toLowerCase())
+                    );
+                } else {
+                    // Quando a busca estiver vazia, mostrar todos os serviços habilitados
+                    this.servicosHabilitados = this.servicos.filter(s => s.habilitado);
+                }
+            },
+            servicosHabilitadosFiltrados: function () {
+                const search = this.servicoSearch.toLowerCase().trim();
+                
+                return this.servicosHabilitados.filter(function (su) {
+                    if (!search) {
+                        return true;
+                    }
+                    
+                    // Procura em múltiplos campos
+                    return (
+                        su.sigla.toLowerCase().includes(search) ||
+                        su.servico.nome.toLowerCase().includes(search) ||
+                        (su.servico.descricao && su.servico.descricao.toLowerCase().includes(search))
+                    );
                 });
             },
             agendamentosFiltrados: function () {
@@ -76,6 +112,13 @@
             },
         },
         methods: {
+            autoSubmitSearch: _.debounce(function(e) {
+                if (e.target.value.length >= 2) { // só busca com 2 ou mais caracteres
+                    document.getElementById('form-search').submit();
+                } else if (e.target.value.length === 0) { // quando apagar tudo
+                    window.location.href = document.getElementById('form-search').action;
+                }
+            }, 500),
             update: function () {
                 var self = this;
                 App.ajax({
@@ -312,6 +355,11 @@
                     }
                 }
             }
+        },
+        watch: {
+            servicoSearch: _.debounce(function(newVal) {
+                // A filtragem é feita automaticamente pelo computed property
+            }, 300)
         },
         mounted() { 
             App.SSE.connect([
